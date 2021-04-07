@@ -1,13 +1,10 @@
 const jwt = require('jsonwebtoken');
+const { errorResponse } = require('../helpers/responses');
 
 // To Check whether the access token exists in header or not
 const checkAuth = (req, res, next) => {
   if (!req.headers.authorization) {
-    return res.status(401).json({
-      status: 401,
-      success: false,
-      message: 'No Token'
-    });
+    return res.status(401).json(errorResponse(401, 'No Token'));
   }
   next();
 };
@@ -20,29 +17,13 @@ const verifyToken = (req, res, next) => {
     if (err) {
       switch(err.name) {
         case 'TokenExpiredError':
-          return res.status(401).json({
-            status: 401,
-            success: false,
-            message: 'Token Expired'
-          });
+          return res.status(401).json(errorResponse(401, 'Token Expired'));
         case 'JsonWebTokenError':
-          return res.status(401).json({
-            status: 401,
-            success: false,
-            message: 'Invalid Token'
-          });
+          return res.status(401).json(errorResponse(401, 'Invalid Token'));
         case 'SyntaxError':
-          return res.status(401).json({
-            status: 401,
-            success: false,
-            message: 'Malformed Token'
-          });
-        default: 
-          return res.status(401).json({
-            status: 401,
-            success: false,
-            message: err.message
-          });
+          return res.status(401).json(errorResponse(401, 'Malformed Token'));
+        default:
+          return res.status(401).json(errorResponse(401, err.message));
       }
     }
     next();
