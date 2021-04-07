@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const db = require('../utils/db');
+const createToken = require('../utils/createToken');
 
 exports.signup = (req, res, next) => {
   const userDetails = req.body;
@@ -40,33 +41,31 @@ exports.login = (req, res, next) => {
         message: err.message
       });
     }
-    
-    if(rows.length < 1) {
-      return res.status(401).json({
-        status: 401,
-        success: false,
-        message: 'Email is not registered'
-      }); 
-    }
 
     const user = rows[0];
     bcrypt.compare(password, user.password)
       .then(doMatch => {
         delete user.password;
+        const accessToken = createToken({ userId: user.id, email: user.email }, 1*60);
         return res.status(200).json({
           status: 200,
           success: true,
           message: `Logged In Successfully!`,
-          payload: rows[0]
+          payload: rows[0],
+          accessToken: accessToken
         });
       })
       .catch(err => {
         return res.status(401).json({
           status: 401,
           success: false,
-          message: `Invalid Email or Password`
+          message: err.message
         });
       });
     
   });
 };
+
+exports.landingPage = (req, res, next) => {
+  res.send('Authorized User Content');
+}
