@@ -1,4 +1,4 @@
-const authController = require('../controllers/authentication');
+const authController = require('../controllers/authController');
 const { checkEmailInUse, checkEmailExist } = require('../middlewares/validateEmail');
 const { checkAuth, verifyToken } = require('../middlewares/validateToken');
 
