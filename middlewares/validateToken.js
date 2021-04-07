@@ -31,6 +31,12 @@ const verifyToken = (req, res, next) => {
             success: false,
             message: 'Invalid Token'
           });
+        case 'SyntaxError':
+          return res.status(401).json({
+            status: 401,
+            success: false,
+            message: 'Malformed Token'
+          });
         default: 
           return res.status(401).json({
             status: 401,

@@ -1,3 +1,4 @@
+// Error response
 const errorResponse = (status, message) => {
   return {
     status: status,
@@ -6,6 +7,7 @@ const errorResponse = (status, message) => {
   };
 };
 
+// Response on success with message
 const msgResponse = (status, message) => {
   return {
     status: status,
@@ -14,6 +16,7 @@ const msgResponse = (status, message) => {
   };
 };
 
+// Response on success with message as well as payload
 const dataResponse = (status, message, data) => {
   return {
     status: status,
@@ -23,6 +26,7 @@ const dataResponse = (status, message, data) => {
   };
 };
 
+// Response on success with message, payload and Token
 const tokenResponse = (status, message, data, token) => {
   return {
     status: status,
