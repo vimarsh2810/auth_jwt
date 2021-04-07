@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const db = require('../utils/db');
-const createToken = require('../utils/createToken');
+const createToken = require('../helpers/createToken');
+const { errorResponse, msgResponse, dataResponse, tokenResponse } = require('../helpers/responses');
 
 exports.signup = (req, res, next) => {
   const userDetails = req.body;
@@ -12,18 +13,10 @@ exports.signup = (req, res, next) => {
   db.query(sql, (err, result) => {
 
     if(err) {
-      return res.status(500).json({
-        status: 500,
-        success: false,
-        message: err.message
-      });
+      return res.status(500).json(errorResponse(500, err.message));
     }
 
-    return res.status(200).json({
-      status: 200,
-      success: true,
-      message: `Insertion Successul, InsertId = ${result.insertId}`
-    });
+    return res.status(200).json(msgResponse(200, `Insertion Successul, InsertId = ${result.insertId}`));
   });
 };
 
@@ -35,34 +28,18 @@ exports.login = (req, res, next) => {
   db.query(sql, (err, rows, fields) => {
 
     if(err) {
-      return res.status(500).json({
-        status: 500,
-        success: false,
-        message: err.message
-      });
+      return res.status(500).json(errorResponse(500, err.message));
     }
 
     const user = rows[0];
-    bcrypt.compare(password, user.password)
-      .then(doMatch => {
-        delete user.password;
-        const accessToken = createToken({ userId: user.id, email: user.email }, 1*60);
-        return res.status(200).json({
-          status: 200,
-          success: true,
-          message: `Logged In Successfully!`,
-          payload: rows[0],
-          accessToken: accessToken
-        });
-      })
-      .catch(err => {
-        return res.status(401).json({
-          status: 401,
-          success: false,
-          message: err.message
-        });
-      });
+    const result = bcrypt.compareSync(password, user.password);
     
+    if(result) {
+      delete user.password;
+      const token = createToken({ userId: user.id, email: user.email }, 1*60);
+      return res.status(200).json(tokenResponse(500, `Logged In Successfully!`, rows[0], token));
+    }
+    return res.status(401).json(errorResponse(401, 'Incorrect Email or Password'));
   });
 };
 
