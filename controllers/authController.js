@@ -33,16 +33,23 @@ exports.login = (req, res, next) => {
 
     const user = rows[0];
     const result = bcrypt.compareSync(password, user.password);
-    
+    delete user.password;
     if(result) {
-      delete user.password;
-      const token = createToken({ userId: user.id, email: user.email }, 1*60);
+      const token = createToken({ userId: user.id, email: user.email }, 1*60); // pass 1 or 2 mins to check token expiry
       return res.status(200).json(tokenResponse(500, `Logged In Successfully!`, rows[0], token));
     }
     return res.status(401).json(errorResponse(401, 'Incorrect Email or Password'));
   });
 };
 
-exports.landingPage = (req, res, next) => {
-  res.send('Authorized User Content');
+exports.dashboard = (req, res, next) => {
+  const userId = req.userData.userId;
+  const sql = `SELECT id, name, email, username FROM users WHERE id = '${userId}'`;
+  
+  db.query(sql, (err, rows, fields) => {
+    if(err) {
+      return res.status(500).json(errorResponse(500, err.message));
+    }
+    return res.status(200).json(dataResponse(200, `User Details of Logged In user`, rows[0]));
+  });
 }

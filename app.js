@@ -2,8 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const createError = require('http-errors');
 
-const authRouter = require('./routes/auth');
-const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth.route.js');
+const usersRouter = require('./routes/users.route.js');
 
 const app = express();
 

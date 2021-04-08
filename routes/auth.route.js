@@ -1,15 +1,18 @@
 const authController = require('../controllers/authController');
 const { checkEmailInUse, checkEmailExist } = require('../middlewares/validateEmail');
-const { checkAuth, verifyToken } = require('../middlewares/validateToken');
+const verifyToken = require('../middlewares/validateToken');
 
 const { Router } = require('express');
 
 const router = Router();
 
+// POST - Register new user
 router.post('/signup', checkEmailInUse, authController.signup);
 
+// POST - Login with correct credentials
 router.post('/login', checkEmailExist, authController.login);
 
-router.get('/landingPage', checkAuth, verifyToken, authController.landingPage);
+// GET - Details of Logged In User
+router.get('/dashboard', verifyToken, authController.dashboard);
 
 module.exports = router;
